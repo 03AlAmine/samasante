@@ -1,0 +1,61 @@
+.form-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-card);
+  transition: var(--transition);
+}
+
+.form-container:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.form-title {
+  color: var(--primary-dark);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+button[mat-raised-button] {
+  padding: 0.5rem 2rem;
+}
+
+button[mat-stroked-button] {
+  padding: 0.5rem 2rem;
+  border-color: var(--border-color);
+}
+
+mat-spinner {
+  margin: 0 auto;
+}
+
+/* Snackbar styles */
+.success-snackbar {
+  background-color: var(--success-color) !important;
+  color: var(--white) !important;
+}
+
+.error-snackbar {
+  background-color: var(--danger-color) !important;
+  color: var(--white) !important;
+}

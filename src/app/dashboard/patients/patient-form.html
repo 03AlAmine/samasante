@@ -1,0 +1,102 @@
+<div class="form-container mat-elevation-z8">
+  <h2 class="form-title">{{ isEditMode ? 'Modifier' : 'Nouveau' }} Patient</h2>
+
+  <form [formGroup]="patientForm" (ngSubmit)="handleSubmit()" class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input
+        matInput
+        formControlName="lastName"
+        placeholder="Dupont"
+        required
+      >
+      <mat-error *ngIf="patientForm.get('lastName')?.hasError('required')">
+        Le nom est obligatoire
+      </mat-error>
+      <mat-error *ngIf="patientForm.get('lastName')?.hasError('maxlength')">
+        Maximum 50 caractères
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prénom</mat-label>
+      <input
+        matInput
+        formControlName="firstName"
+        placeholder="Jean"
+        required
+      >
+      <mat-error *ngIf="patientForm.get('firstName')?.hasError('required')">
+        Le prénom est obligatoire
+      </mat-error>
+      <mat-error *ngIf="patientForm.get('firstName')?.hasError('maxlength')">
+        Maximum 50 caractères
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        formControlName="email"
+        type="email"
+        placeholder="jean.dupont@example.com"
+        required
+      >
+      <mat-error *ngIf="patientForm.get('email')?.hasError('required')">
+        L'email est obligatoire
+      </mat-error>
+      <mat-error *ngIf="patientForm.get('email')?.hasError('email')">
+        Email invalide
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Téléphone</mat-label>
+      <input
+        matInput
+        formControlName="phone"
+        placeholder="06 12 34 56 78"
+      >
+      <mat-error *ngIf="patientForm.get('phone')?.hasError('invalidPhone')">
+        Format de téléphone invalide
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date de naissance</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="birthDate"
+        [max]="maxDate"
+      >
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <div class="form-actions">
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="cancel()"
+        [disabled]="isLoading"
+      >
+        Annuler
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="patientForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">
+          {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+        </span>
+        <span *ngIf="isLoading">
+          <mat-spinner diameter="20"></mat-spinner>
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

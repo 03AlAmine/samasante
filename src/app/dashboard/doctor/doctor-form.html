@@ -1,0 +1,58 @@
+<div class="form-container mat-elevation-z8">
+  <h2 class="form-title">Ajouter un nouveau médecin</h2>
+
+  <form [formGroup]="doctorForm" (ngSubmit)="onSubmit()" class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Prénom</mat-label>
+      <input matInput formControlName="firstName" required>
+      <mat-error *ngIf="doctorForm.get('firstName')?.hasError('required')">
+        Le prénom est obligatoire
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="lastName" required>
+      <mat-error *ngIf="doctorForm.get('lastName')?.hasError('required')">
+        Le nom est obligatoire
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Spécialité</mat-label>
+      <input matInput formControlName="specialty" required>
+      <mat-error *ngIf="doctorForm.get('specialty')?.hasError('required')">
+        La spécialité est obligatoire
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" required>
+      <mat-error *ngIf="doctorForm.get('email')?.hasError('required')">
+        L'email est obligatoire
+      </mat-error>
+      <mat-error *ngIf="doctorForm.get('email')?.hasError('email')">
+        Email invalide
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Téléphone</mat-label>
+      <input matInput formControlName="phone" required>
+      <mat-error *ngIf="doctorForm.get('phone')?.hasError('required')">
+        Le téléphone est obligatoire
+      </mat-error>
+    </mat-form-field>
+
+    <div class="form-actions">
+      <button mat-stroked-button type="button" routerLink="/doctors" [disabled]="isLoading">
+        Annuler
+      </button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="doctorForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Ajouter</span>
+        <span *ngIf="isLoading">Enregistrement...</span>
+      </button>
+    </div>
+  </form>
+</div>

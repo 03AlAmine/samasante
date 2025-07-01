@@ -1,0 +1,61 @@
+<div class="auth-container">
+  <div class="auth-header">
+    <h2>Inscription</h2>
+    <p>Créez un compte pour accéder à toutes les fonctionnalités</p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="auth-form">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        [(ngModel)]="email"
+        name="email"
+        required
+        placeholder="votre@email.com"
+        class="form-input"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="password">Mot de passe</label>
+      <input
+        type="password"
+        id="password"
+        [(ngModel)]="password"
+        name="password"
+        required
+        placeholder="••••••••"
+        class="form-input"
+      >
+      <small class="password-hint">Minimum 8 caractères</small>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirmer le mot de passe</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+        required
+        placeholder="••••••••"
+        class="form-input"
+      >
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <button type="submit" class="submit-button" [disabled]="isLoading">
+      <span *ngIf="!isLoading">S'inscrire</span>
+      <span *ngIf="isLoading">Inscription en cours...</span>
+    </button>
+  </form>
+
+  <div class="auth-footer">
+    <p>Déjà un compte ? <a routerLink="/login" class="auth-link">Se connecter</a></p>
+  </div>
+</div>

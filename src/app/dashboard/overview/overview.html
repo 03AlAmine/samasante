@@ -1,0 +1,180 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Tableau de Bord</h1>
+    <p class="welcome-message">Bienvenue dans votre espace d'administration</p>
+  </div>
+
+  <div class="stats-grid">
+    <!-- Carte Patients -->
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon patient">
+          <mat-icon>group</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalPatients }}</h3>
+          <p>Patients</p>
+          <span class="stat-change positive" *ngIf="newPatientsThisWeek > 0">
+            +{{ newPatientsThisWeek }} cette semaine
+          </span>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Carte Médecins -->
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon doctor">
+          <mat-icon>medical_services</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalDoctors }}</h3>
+          <p>Médecins</p>
+          <span class="stat-change positive" *ngIf="newDoctorsThisWeek > 0">
+            +{{ newDoctorsThisWeek }} cette semaine
+          </span>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Carte RDV Aujourd'hui -->
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon appointment">
+          <mat-icon>event_available</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ todayAppointments }}</h3>
+          <p>RDV aujourd'hui</p>
+          <span>{{ upcomingAppointments }} à venir</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Carte Taux de Remplissage -->
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon occupancy">
+          <mat-icon>bar_chart</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ occupancyRate }}%</h3>
+          <p>Taux de remplissage</p>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="occupancyRate"
+            [color]="occupancyRate > 80 ? 'warn' : 'primary'">
+          </mat-progress-bar>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Graphique RDV Hebdomadaire -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Activité Hebdomadaire</mat-card-title>
+        <mat-card-subtitle>Rendez-vous par jour</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="appointmentsChartData"
+            [options]="chartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Graphique Patients Mensuels -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Nouveaux Patients</mat-card-title>
+        <mat-card-subtitle>Évolution mensuelle</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="patientsChartData"
+            [options]="chartOptions"
+            [type]="'line'">
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Nouveaux Patients -->
+    <mat-card class="list-card">
+      <mat-card-header>
+        <mat-card-title>Nouveaux Patients</mat-card-title>
+        <mat-card-subtitle>Dernières inscriptions</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let patient of newPatients">
+            <div class="avatar">{{ patient.firstName?.charAt(0) }}{{ patient.lastName?.charAt(0) }}</div>
+            <div class="info">
+              <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+              <p>{{ patient.email }}</p>
+            </div>
+            <button mat-icon-button>
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button mat-stroked-button color="primary" class="view-all">Voir tous les patients</button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Nouveaux Médecins -->
+    <mat-card class="list-card">
+      <mat-card-header>
+        <mat-card-title>Nouveaux Médecins</mat-card-title>
+        <mat-card-subtitle>Dernières inscriptions</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let doctor of newDoctors">
+            <div class="avatar">{{ doctor.firstName?.charAt(0) }}{{ doctor.lastName?.charAt(0) }}</div>
+            <div class="info">
+              <h4>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h4>
+              <p>{{ doctor.specialty }}</p>
+            </div>
+            <button mat-icon-button>
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+        <button mat-stroked-button color="primary" class="view-all">Voir tous les médecins</button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Prochains RDV -->
+    <mat-card class="list-card">
+      <mat-card-header>
+        <mat-card-title>Prochains Rendez-vous</mat-card-title>
+        <mat-card-subtitle>Aujourd'hui et demain</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="appointments-list">
+          <div class="appointment-item" *ngFor="let appt of nextAppointments">
+            <div class="appointment-time">
+              <div class="time">{{ appt.date | date:'HH:mm' }}</div>
+              <div class="date">{{ appt.date | date:'dd/MM' }}</div>
+            </div>
+            <div class="appointment-info">
+              <h4>{{ appt.patientName }}</h4>
+              <p>{{ appt.reason }}</p>
+            </div>
+            <div class="appointment-actions">
+              <button mat-icon-button>
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button mat-stroked-button color="primary" class="view-all">Voir tous les RDV</button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

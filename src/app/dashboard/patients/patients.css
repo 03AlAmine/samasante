@@ -1,0 +1,152 @@
+.patients-container {
+  padding: 2rem;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-card);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header h2 {
+  color: var(--primary-dark);
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  min-width: 250px;
+  background-color: var(--white);
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-container {
+  position: relative;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  background-color: var(--white);
+}
+
+.table-container.loading {
+  min-height: 300px;
+}
+
+table {
+  width: 100%;
+}
+
+th.mat-header-cell {
+  background-color: var(--primary-color);
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+td.mat-cell,
+th.mat-header-cell {
+  padding: 1rem;
+  border-bottom-color: var(--border-color);
+}
+
+.patient-name {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.id {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.email a,
+.phone a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.email a:hover,
+.phone a:hover {
+  text-decoration: underline;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-light);
+}
+
+.no-results mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  color: var(--gray-medium);
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Snackbar styles */
+.success-snackbar {
+  background-color: var(--success-color) !important;
+  color: var(--white) !important;
+}
+
+.error-snackbar {
+  background-color: var(--danger-color) !important;
+  color: var(--white) !important;
+}

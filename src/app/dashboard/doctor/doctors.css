@@ -1,0 +1,48 @@
+.doctors-container {
+  padding: 2rem;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-card);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header h2 {
+  color: var(--primary-dark);
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  min-width: 250px;
+  background-color: var(--white);
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-container {
+  position: relative;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  background-color: var(--white);
+}
+
+/* ... (reprenez le reste du CSS de patients.component.css en adaptant les sélecteurs) */

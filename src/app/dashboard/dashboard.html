@@ -1,0 +1,107 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened class="sidenav">
+    <div class="sidenav-header">
+      <div class="logo-container">
+        <mat-icon class="logo-icon">medical_services</mat-icon>
+        <span class="logo-text">SamaSanté</span>
+      </div>
+      <button mat-icon-button class="toggle-button" (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <mat-nav-list>
+      <!-- Vue d'ensemble -->
+      <a mat-list-item routerLink="overview" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon class="menu-icon">dashboard</mat-icon>
+        <span class="menu-text">Tableau de bord</span>
+      </a>
+
+      <!-- Patients -->
+      <a mat-list-item routerLink="patients" routerLinkActive="active-link">
+        <mat-icon class="menu-icon">personal_injury</mat-icon>
+        <span class="menu-text">Patients</span>
+      </a>
+
+      <!-- Médecins -->
+      <a mat-list-item routerLink="doctors" routerLinkActive="active-link">
+        <mat-icon class="menu-icon">medical_services</mat-icon>
+        <span class="menu-text">Médecins</span>
+      </a>
+
+      <!-- Rendez-vous -->
+      <a mat-list-item routerLink="appointments" routerLinkActive="active-link">
+        <mat-icon class="menu-icon">event_available</mat-icon>
+        <span class="menu-text">Rendez-vous</span>
+      </a>
+
+      <!-- Calendrier -->
+      <a mat-list-item routerLink="calendar" routerLinkActive="active-link">
+        <mat-icon class="menu-icon">calendar_today</mat-icon>
+        <span class="menu-text">Calendrier</span>
+      </a>
+
+      <mat-divider class="menu-divider"></mat-divider>
+
+      <!-- Profil -->
+      <a mat-list-item routerLink="profile" routerLinkActive="active-link">
+        <mat-icon class="menu-icon">account_circle</mat-icon>
+        <span class="menu-text">Mon Profil</span>
+      </a>
+
+      <!-- Paramètres -->
+      <a mat-list-item routerLink="settings" routerLinkActive="active-link">
+        <mat-icon class="menu-icon">settings</mat-icon>
+        <span class="menu-text">Paramètres</span>
+      </a>
+
+      <!-- Déconnexion -->
+      <a mat-list-item (click)="logout()" class="logout-item">
+        <mat-icon class="menu-icon">logout</mat-icon>
+        <span class="menu-text">Déconnexion</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <mat-toolbar color="primary" class="main-toolbar">
+      <button mat-icon-button class="mobile-menu-button" (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="toolbar-title">Tableau de bord</span>
+
+      <div class="toolbar-spacer"></div>
+
+      <div class="user-info">
+        <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+          <div class="user-avatar">{{ user?.firstName?.charAt(0) }}{{ user?.lastName?.charAt(0) }}</div>
+          <span class="user-name">{{ user?.firstName }} {{ user?.lastName }}</span>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/profile">
+            <mat-icon>account_circle</mat-icon>
+            <span>Mon Profil</span>
+          </button>
+          <button mat-menu-item routerLink="/settings">
+            <mat-icon>settings</mat-icon>
+            <span>Paramètres</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Déconnexion</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-toolbar>
+
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
