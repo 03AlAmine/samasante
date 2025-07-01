@@ -10,8 +10,11 @@ import { AppointmentService } from '../../core/services/appointment.service';
 import { AuthService } from '../../core/services/auth.service';
 import { DoctorService } from '../../core/services/doctor.service';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-import { forkJoin } from 'rxjs';
+import { ChartConfiguration, ChartData } from 'chart.js';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatMenuModule } from '@angular/material/menu';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-overview',
@@ -23,12 +26,18 @@ import { forkJoin } from 'rxjs';
     MatIconModule,
     MatButtonModule,
     MatProgressBarModule,
-    BaseChartDirective
+    BaseChartDirective,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatMenuModule,
+       CommonModule,
+    RouterModule,
   ],
   templateUrl: './overview.html',
   styleUrls: ['./overview.css']
 })
 export class OverviewComponent implements OnInit {
+[x: string]: any;
   // Statistiques
   totalPatients = 0;
   totalDoctors = 0;
@@ -37,6 +46,7 @@ export class OverviewComponent implements OnInit {
   occupancyRate = 0;
   newPatientsThisWeek = 0;
   newDoctorsThisWeek = 0;
+  isLoading = true;
 
   // Listes
   recentPatients: any[] = [];
@@ -104,54 +114,127 @@ export class OverviewComponent implements OnInit {
     private patientService: PatientService,
     private appointmentService: AppointmentService,
     private authService: AuthService,
-    private doctorService: DoctorService
+    private doctorService: DoctorService,
+    private snackBar: MatSnackBar
   ) {}
 
   async ngOnInit() {
-    const user = this.authService.getCurrentUser();
-    if (!user) return;
+    try {
+      const user = await this.authService.getCurrentUser();
+      if (!user) {
+        this.showError('Utilisateur non connecté');
+        return;
+      }
 
-    await this.loadStats(user.uid);
+      await this.loadStats(user.uid);
+    } catch (error) {
+      this.showError('Erreur lors du chargement du tableau de bord');
+      console.error(error);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
-  async loadStats(doctorId: string) {
+  private async loadStats(doctorId: string) {
     try {
-      // Chargement parallèle des données
-      const [patients, doctors, appointments, recentPatients, nextAppointments] = await Promise.all([
-        this.patientService.getPatients(0),
-        this.doctorService.getDoctors(0),
-        this.appointmentService.getAppointmentsBetweenDates(doctorId, this.getStartOfDay(), this.getEndOfDay()),
-        this.patientService.getRecentPatients(5),
-        this.appointmentService.getUpcomingAppointments(doctorId, 5)
+      this.isLoading = true;
+
+      // Chargement parallèle des données principales
+      const [patients, doctors, appointments, recentPatients, nextAppts] = await Promise.all([
+        this.patientService.getPatients().catch(() => []),
+        this.doctorService.getDoctors().catch(() => []),
+        this.appointmentService.getAppointmentsBetweenDates(
+          doctorId,
+          this.getStartOfDay(),
+          this.getEndOfDay()
+        ).catch(() => []),
+        this.patientService.getRecentPatients(5).catch(() => []),
+        this.appointmentService.getUpcomingAppointments(doctorId, 5).catch(() => [])
       ]);
 
-      // Statistiques
+      // Chargement des données supplémentaires
+      const [newPatientsThisWeek, newDoctorsThisWeek] = await Promise.all([
+        this.patientService.getNewPatientsThisWeek().catch(() => []),
+        this.doctorService.getNewDoctorsThisWeek().catch(() => [])
+      ]);
+
+      // Mise à jour des statistiques
       this.totalPatients = patients.length;
       this.totalDoctors = doctors.length;
       this.todayAppointments = appointments.length;
-      this.upcomingAppointments = (await this.appointmentService.getUpcomingAppointments(doctorId, 7)).length;
-      const newPatientsThisWeek = await this.patientService.getNewPatientsThisWeek();
-      this.newPatientsThisWeek = Array.isArray(newPatientsThisWeek) ? newPatientsThisWeek.length : 0;
-      const newDoctorsThisWeek = await this.doctorService.getNewDoctorsThisWeek();
-      this.newDoctorsThisWeek = Array.isArray(newDoctorsThisWeek) ? newDoctorsThisWeek.length : 0;
+      this.upcomingAppointments = nextAppts.length;
+      this.newPatientsThisWeek = newPatientsThisWeek.length;
+      this.newDoctorsThisWeek = newDoctorsThisWeek.length;
 
-      // Taux de remplissage
-      const totalSlots = 20;
+      // Calcul du taux de remplissage
+      const totalSlots = 20; // À adapter selon votre configuration
       this.occupancyRate = Math.round((this.todayAppointments / totalSlots) * 100);
 
-      // Listes
+      // Mise à jour des listes
       this.recentPatients = recentPatients;
-      this.nextAppointments = nextAppointments;
-      this.newPatients = await this.patientService.getPatients(3);
-      this.newDoctors = await this.doctorService.getDoctors(3);
+      this.nextAppointments = nextAppts;
+      this.newPatients = await this.patientService.getRecentPatients(3).catch(() => []);
+      this.newDoctors = await this.doctorService.getDoctors(3).catch(() => []);
 
-      // Données des graphiques (simulées)
-      this.appointmentsChartData.datasets[0].data = [5, 7, 3, 8, 4, 1, 0];
-      this.patientsChartData.datasets[0].data = [12, 15, 8, 10, 18, 22, 25, 20, 28, 30, 27, 35];
+      // Mise à jour des graphiques
+      await this.updateChartsData(doctorId);
 
     } catch (error) {
       console.error('Erreur lors du chargement des statistiques:', error);
+      this.showError('Erreur lors du chargement des données');
+    } finally {
+      this.isLoading = false;
     }
+  }
+
+  private async updateChartsData(doctorId: string) {
+    try {
+      // Données hebdomadaires pour le graphique à barres
+      const weeklyAppointments = await this.getWeeklyAppointments(doctorId);
+      this.appointmentsChartData.datasets[0].data = weeklyAppointments;
+
+      // Données mensuelles pour le graphique linéaire
+      const monthlyPatients = await this.getMonthlyPatients();
+      this.patientsChartData.datasets[0].data = monthlyPatients;
+
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des graphiques:', error);
+      // Valeurs par défaut en cas d'erreur
+      this.appointmentsChartData.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
+      this.patientsChartData.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    }
+  }
+
+  private async getWeeklyAppointments(doctorId: string): Promise<number[]> {
+    const days = [];
+    const today = new Date();
+
+    // Générer les 7 derniers jours
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      days.push(date);
+    }
+
+    // Récupérer les rendez-vous pour chaque jour
+    return Promise.all(
+      days.map(async day => {
+        const start = new Date(day);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(day);
+        end.setHours(23, 59, 59, 999);
+
+        const apps = await this.appointmentService.getAppointmentsBetweenDates(doctorId, start, end);
+        return apps.length;
+      })
+    );
+  }
+
+  private async getMonthlyPatients(): Promise<number[]> {
+    // Implémentation simplifiée - à adapter selon votre structure de données
+    // Retourne un tableau de 12 éléments (un par mois)
+    return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Remplacez par votre logique
   }
 
   private getStartOfDay(): Date {
@@ -164,5 +247,12 @@ export class OverviewComponent implements OnInit {
     const date = new Date();
     date.setHours(23, 59, 59, 999);
     return date;
+  }
+
+  private showError(message: string): void {
+    this.snackBar.open(message, 'Fermer', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
   }
 }

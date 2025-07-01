@@ -12,7 +12,7 @@
           <mat-icon>group</mat-icon>
         </div>
         <div class="stat-info">
-          <h3>{{ totalPatients }}</h3>
+          <h3>{{ totalPatients | number }}</h3>
           <p>Patients</p>
           <span class="stat-change positive" *ngIf="newPatientsThisWeek > 0">
             +{{ newPatientsThisWeek }} cette semaine
@@ -28,7 +28,7 @@
           <mat-icon>medical_services</mat-icon>
         </div>
         <div class="stat-info">
-          <h3>{{ totalDoctors }}</h3>
+          <h3>{{ totalDoctors | number }}</h3>
           <p>Médecins</p>
           <span class="stat-change positive" *ngIf="newDoctorsThisWeek > 0">
             +{{ newDoctorsThisWeek }} cette semaine
@@ -44,9 +44,9 @@
           <mat-icon>event_available</mat-icon>
         </div>
         <div class="stat-info">
-          <h3>{{ todayAppointments }}</h3>
+          <h3>{{ todayAppointments | number }}</h3>
           <p>RDV aujourd'hui</p>
-          <span>{{ upcomingAppointments }} à venir</span>
+          <span>{{ upcomingAppointments | number }} à venir</span>
         </div>
       </div>
     </mat-card>
@@ -58,7 +58,7 @@
           <mat-icon>bar_chart</mat-icon>
         </div>
         <div class="stat-info">
-          <h3>{{ occupancyRate }}%</h3>
+          <h3>{{ occupancyRate | number }}%</h3>
           <p>Taux de remplissage</p>
           <mat-progress-bar
             mode="determinate"
@@ -117,12 +117,17 @@
               <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
               <p>{{ patient.email }}</p>
             </div>
-            <button mat-icon-button>
+            <button mat-icon-button [routerLink]="['/patients', patient.id]">
               <mat-icon>chevron_right</mat-icon>
             </button>
           </div>
+          <div class="empty-state" *ngIf="!newPatients.length">
+            Aucun nouveau patient récent
+          </div>
         </div>
-        <button mat-stroked-button color="primary" class="view-all">Voir tous les patients</button>
+        <button mat-stroked-button color="primary" class="view-all" routerLink="/patients">
+          Voir tous les patients
+        </button>
       </mat-card-content>
     </mat-card>
 
@@ -140,12 +145,17 @@
               <h4>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h4>
               <p>{{ doctor.specialty }}</p>
             </div>
-            <button mat-icon-button>
+            <button mat-icon-button [routerLink]="['/doctors', doctor.id]">
               <mat-icon>chevron_right</mat-icon>
             </button>
           </div>
+          <div class="empty-state" *ngIf="!newDoctors.length">
+            Aucun nouveau médecin récent
+          </div>
         </div>
-        <button mat-stroked-button color="primary" class="view-all">Voir tous les médecins</button>
+        <button mat-stroked-button color="primary" class="view-all" routerLink="/doctors">
+          Voir tous les médecins
+        </button>
       </mat-card-content>
     </mat-card>
 
@@ -167,13 +177,23 @@
               <p>{{ appt.reason }}</p>
             </div>
             <div class="appointment-actions">
-              <button mat-icon-button>
+              <button mat-icon-button [matMenuTriggerFor]="apptMenu">
                 <mat-icon>more_vert</mat-icon>
               </button>
+              <mat-menu #apptMenu="matMenu">
+                <button mat-menu-item [routerLink]="['/appointments', appt.id]">Détails</button>
+                <button mat-menu-item [routerLink]="['/appointments', appt.id, 'edit']">Modifier</button>
+                <button mat-menu-item (click)="this['cancelAppointment'](appt.id)">Annuler</button>
+              </mat-menu>
             </div>
           </div>
+          <div class="empty-state" *ngIf="!nextAppointments.length">
+            Aucun rendez-vous à venir
+          </div>
         </div>
-        <button mat-stroked-button color="primary" class="view-all">Voir tous les RDV</button>
+        <button mat-stroked-button color="primary" class="view-all" routerLink="/appointments">
+          Voir tous les RDV
+        </button>
       </mat-card-content>
     </mat-card>
   </div>

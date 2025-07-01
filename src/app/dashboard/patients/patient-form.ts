@@ -39,7 +39,6 @@ export class PatientFormComponent implements OnInit {
   ) {
     this.maxDate = new Date();
     this.patientForm = this.fb.group({
-      id: [''],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
@@ -56,14 +55,20 @@ export class PatientFormComponent implements OnInit {
     }
   }
 
-  async loadPatient(id: string) {
-    this.isLoading = true;
-    try {
-      const patient = await this.patientService.getPatientById(id);
+async loadPatient(id: string) {
+  this.isLoading = true;
+  try {
+    const patient = await this.patientService.getPatientById(id);
+    if (patient) {
       this.patientForm.patchValue({
-        ...patient,
-        birthDate: patient['birthDate'] ? new Date(patient['birthDate']) : null
-      });
+        id: patient.id,
+        lastName: patient.lastName,
+        firstName: patient.firstName,
+        email: patient.email,
+        phone: patient.phone,
+          birthDate: patient.birthDate ? new Date(patient.birthDate) : null
+        });
+      }
     } catch (error) {
       this.showError('Erreur lors du chargement du patient');
       this.router.navigate(['/dashboard/patients']);
